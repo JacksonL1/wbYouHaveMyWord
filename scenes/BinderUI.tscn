@@ -1,0 +1,180 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://core/BinderUI.gd" id="1_binder"]
+[ext_resource type="Texture2D" path="res://assets/ui/ghost_hand.png" id="2_ghost"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_binder"]
+bg_color = Color(0.957, 0.792, 0.545, 1)
+border_width_top = 7
+border_width_left = 7
+border_width_right = 7
+border_color = Color(0.851, 0.62, 0.353, 1)
+corner_radius_top_left = 30
+corner_radius_top_right = 30
+shadow_color = Color(0.29, 0.24, 0.35, 0.2)
+shadow_size = 14
+shadow_offset = Vector2(0, -4)
+anti_aliasing = true
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_chip"]
+bg_color = Color(1, 1, 1, 0.92)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(1, 0.788, 0.302, 1)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
+shadow_color = Color(0.29, 0.24, 0.35, 0.14)
+shadow_size = 7
+shadow_offset = Vector2(0, 3)
+anti_aliasing = true
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
+bg_color = Color(1, 1, 1, 0.9)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.851, 0.62, 0.353, 1)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+anti_aliasing = true
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
+bg_color = Color(1, 0.878, 0.541, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.851, 0.62, 0.353, 1)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+anti_aliasing = true
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
+bg_color = Color(0.941, 0.761, 0.353, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.788, 0.561, 0.286, 1)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+anti_aliasing = true
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_focus"]
+
+[node name="BinderUI" type="CanvasLayer"]
+layer = 1
+script = ExtResource("1_binder")
+
+[node name="Root" type="Control" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="BinderPanel" type="Panel" parent="Root"]
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -172.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_binder")
+
+[node name="Scroll" type="ScrollContainer" parent="Root/BinderPanel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 22.0
+offset_top = 16.0
+offset_right = -22.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_scroll_mode = 1
+vertical_scroll_mode = 0
+
+[node name="CardRow" type="HBoxContainer" parent="Root/BinderPanel/Scroll"]
+custom_minimum_size = Vector2(0, 140)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="TopBar" type="Control" parent="Root"]
+anchor_right = 1.0
+offset_top = 20.0
+offset_bottom = 80.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="LevelChip" type="Panel" parent="Root/TopBar"]
+offset_right = 244.0
+offset_bottom = 58.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_chip")
+
+[node name="Title" type="Label" parent="Root/TopBar/LevelChip"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 4.0
+offset_right = -10.0
+offset_bottom = -4.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.286, 0.243, 0.341, 1)
+theme_override_font_sizes/font_size = 32
+text = "起床"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Dots" type="HBoxContainer" parent="Root/TopBar"]
+offset_left = 270.0
+offset_top = 15.0
+offset_right = 620.0
+offset_bottom = 45.0
+theme_override_constants/separation = 12
+alignment = 0
+
+[node name="MuteButton" type="Button" parent="Root/TopBar"]
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -110.0
+offset_top = 2.0
+offset_right = -16.0
+offset_bottom = 58.0
+grow_horizontal = 0
+focus_mode = 0
+theme_override_colors/font_color = Color(0.286, 0.243, 0.341, 1)
+theme_override_colors/font_hover_color = Color(0.286, 0.243, 0.341, 1)
+theme_override_colors/font_pressed_color = Color(0.286, 0.243, 0.341, 1)
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+text = "声音"
+
+[node name="GhostHand" type="TextureRect" parent="Root"]
+visible = false
+offset_right = 150.0
+offset_bottom = 150.0
+pivot_offset = Vector2(75, 75)
+mouse_filter = 2
+texture = ExtResource("2_ghost")
+expand_mode = 1
+stretch_mode = 5

@@ -1,0 +1,151 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://core/EndScreen.gd" id="1_end"]
+[ext_resource type="Texture2D" path="res://assets/ui/star.png" id="2_star"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_end"]
+bg_color = Color(1, 0.984, 0.929, 1)
+border_width_left = 6
+border_width_top = 6
+border_width_right = 6
+border_width_bottom = 6
+border_color = Color(1, 0.788, 0.302, 1)
+corner_radius_top_left = 40
+corner_radius_top_right = 40
+corner_radius_bottom_right = 40
+corner_radius_bottom_left = 40
+shadow_color = Color(0.29, 0.24, 0.35, 0.3)
+shadow_size = 18
+shadow_offset = Vector2(0, 6)
+anti_aliasing = true
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
+bg_color = Color(1, 0.82, 0.4, 1)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
+shadow_color = Color(0.29, 0.24, 0.35, 0.2)
+shadow_size = 6
+shadow_offset = Vector2(0, 3)
+anti_aliasing = true
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
+bg_color = Color(1, 0.878, 0.541, 1)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
+anti_aliasing = true
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
+bg_color = Color(0.941, 0.741, 0.302, 1)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
+anti_aliasing = true
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_focus"]
+
+[node name="EndScreen" type="CanvasLayer"]
+layer = 2
+script = ExtResource("1_end")
+
+[node name="Dim" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.286, 0.243, 0.341, 0.549192)
+
+[node name="Panel" type="Panel" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -340.0
+offset_top = -230.0
+offset_right = 340.0
+offset_bottom = 230.0
+pivot_offset = Vector2(340, 230)
+theme_override_styles/panel = SubResource("StyleBoxFlat_end")
+
+[node name="StarL" type="TextureRect" parent="Panel"]
+offset_left = 70.0
+offset_top = 34.0
+offset_right = 194.0
+offset_bottom = 126.0
+pivot_offset = Vector2(62, 62)
+rotation = -0.24
+texture = ExtResource("2_star")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="StarM" type="TextureRect" parent="Panel"]
+anchor_left = 0.5
+anchor_top = 0.0
+anchor_right = 0.5
+anchor_bottom = 0.0
+offset_left = -76.0
+offset_top = 12.0
+offset_right = 76.0
+offset_bottom = 152.0
+pivot_offset = Vector2(76, 76)
+texture = ExtResource("2_star")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="StarR" type="TextureRect" parent="Panel"]
+anchor_left = 1.0
+offset_left = -194.0
+offset_top = 34.0
+offset_right = -70.0
+offset_bottom = 126.0
+pivot_offset = Vector2(62, 62)
+rotation = 0.24
+texture = ExtResource("2_star")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Title" type="Label" parent="Panel"]
+anchor_right = 1.0
+offset_top = 158.0
+offset_bottom = 242.0
+theme_override_colors/font_color = Color(0.286, 0.243, 0.341, 1)
+theme_override_font_sizes/font_size = 62
+text = "Great job!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Sub" type="Label" parent="Panel"]
+anchor_right = 1.0
+offset_top = 248.0
+offset_bottom = 300.0
+theme_override_colors/font_color = Color(0.286, 0.243, 0.341, 0.8)
+theme_override_font_sizes/font_size = 28
+text = "早上好！全部完成"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RestartButton" type="Button" parent="Panel"]
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -160.0
+offset_top = -132.0
+offset_right = 160.0
+offset_bottom = -56.0
+grow_horizontal = 2
+grow_vertical = 0
+focus_mode = 0
+theme_override_colors/font_color = Color(0.286, 0.243, 0.341, 1)
+theme_override_colors/font_hover_color = Color(0.286, 0.243, 0.341, 1)
+theme_override_colors/font_pressed_color = Color(0.286, 0.243, 0.341, 1)
+theme_override_font_sizes/font_size = 34
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+text = "再玩一次 Play again"

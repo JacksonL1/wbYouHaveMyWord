@@ -1,0 +1,25 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://core/Main.gd" id="1_main"]
+[ext_resource type="PackedScene" path="res://scenes/BinderUI.tscn" id="2_binder"]
+[ext_resource type="PackedScene" path="res://scenes/EndScreen.tscn" id="3_end"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_main")
+
+[node name="Background" type="TextureRect" parent="."]
+offset_right = 1280.0
+offset_bottom = 720.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 0
+
+[node name="PropLayer" type="Node2D" parent="."]
+
+[node name="BinderUI" parent="." instance=ExtResource("2_binder")]
+
+[node name="EndScreen" parent="." instance=ExtResource("3_end")]
+
+[node name="IdleTimer" type="Timer" parent="."]
+wait_time = 10.0
+one_shot = true

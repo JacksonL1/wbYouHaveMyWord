@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://core/BaseProp.gd" id="1_prop"]
+[ext_resource type="Texture2D" path="res://assets/ui/glow_ring.png" id="2_ring"]
+
+[node name="Prop" type="Node2D"]
+
+[node name="Glow" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0.62, 0.95, 0.62, 0.55)
+texture = ExtResource("2_ring")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+
+[node name="DropZone" type="Control" parent="."]
+offset_right = 120.0
+offset_bottom = 120.0
+script = ExtResource("1_prop")

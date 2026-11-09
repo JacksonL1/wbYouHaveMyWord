@@ -1,0 +1,21 @@
+# Godot
+.godot/
+*.tmp
+export_presets.cfg
+
+# 本地内置运行时（约 130MB，不入库；双击 启动游戏.bat 需要）
+_engine/
+
+# Python
+__pycache__/
+*.pyc
+
+# 本地预览（非游戏资产）
+.preview/
+
+# 系统文件
+Thumbs.db
+.DS_Store
+
+# WorkBuddy 工作区数据（非项目内容）
+.workbuddy/
