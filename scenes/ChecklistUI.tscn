@@ -15,31 +15,32 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="Title" type="Label" parent="Root"]
-offset_left = 240.0
-offset_top = 116.0
-offset_right = 1040.0
-offset_bottom = 176.0
+offset_left = 140.0
+offset_top = 64.0
+offset_right = 1140.0
+offset_bottom = 130.0
 theme_override_colors/font_color = Color(0.286, 0.243, 0.341, 1)
 theme_override_font_sizes/font_size = 42
-text = "出门前，检查一下！"
+text = "Before we go out, check the list!"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Row" type="HBoxContainer" parent="Root"]
-offset_left = 150.0
-offset_top = 214.0
-offset_right = 1130.0
-offset_bottom = 424.0
-theme_override_constants/separation = 18
-alignment = 1
+[node name="Row" type="GridContainer" parent="Root"]
+offset_left = 331.0
+offset_top = 165.0
+offset_right = 949.0
+offset_bottom = 617.0
+theme_override_constants/h_separation = 24
+theme_override_constants/v_separation = 24
+columns = 3
 
 [node name="Hint" type="Label" parent="Root"]
-offset_left = 240.0
-offset_top = 448.0
+offset_left = 140.0
+offset_top = 640.0
 offset_right = 1040.0
-offset_bottom = 496.0
+offset_bottom = 692.0
 theme_override_colors/font_color = Color(0.42, 0.37, 0.46, 1)
 theme_override_font_sizes/font_size = 26
-text = "按顺序点亮小徽章，就可以出门啦！"
+text = "Tap the badges in order, then we can go out!"
 horizontal_alignment = 1
 vertical_alignment = 1

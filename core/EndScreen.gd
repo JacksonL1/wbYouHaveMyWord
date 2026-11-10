@@ -18,7 +18,7 @@ func _ready() -> void:
 func show_result(total: int) -> void:
 	visible = true
 	_title.text = "Great job!"
-	_sub.text = "早上好！%d / %d 全部完成" % [total, total]
+	_sub.text = "Good morning! %d / %d all done!" % [total, total]
 
 	_dim.modulate.a = 0.0
 	_panel.modulate.a = 0.0

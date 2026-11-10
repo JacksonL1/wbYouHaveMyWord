@@ -72,20 +72,25 @@ func _run(main: Node) -> void:
 	await _wait(2)
 	_check(ghost.visible == false, "开始拖拽后隐藏小手")
 
-	# 4) 拖对卡片 → 起床动画（3s）后自动进下一关
+	# 4) 拖对卡片 → 起床动画（3s）→ 走路过场 → 自动进下一关
 	zone._drop_data(Vector2.ZERO, {"card_id": "card_wake"})
 	await _wait(10)
 	_check(main._state == main.State.LOCKED, "匹配成功进入 LOCKED")
-	await _seconds(3.4)
-	_check(main._index == 1, "起床动画结束后进入第 2 关")
+	await _seconds(6.0)
+	_check(main._index == 1, "起床动画 + 走路过场结束后进入第 2 关")
 	_check(main._state == main.State.PLAYING, "新关卡回到 PLAYING")
 	_check(character.rotation == 0.0, "小人已站起")
 
 	# 5) 连通全流程直至结算（清单关改为点徽章）
 	var guard := 0
 	var pants_seen := {"ok": false}
-	while main._state != main.State.FINISHED and guard < 40:
+	while main._state != main.State.FINISHED and guard < 60:
 		guard += 1
+		# 等待本关就绪（含场景切换的走路过场）
+		var ready_guard := 0
+		while main._state == main.State.LOCKED and ready_guard < 40:
+			ready_guard += 1
+			await _seconds(0.25)
 		var lv: Dictionary = main._current_level()
 		if str(lv.get("kind", "")) == "checklist":
 			_check(checklist._root.visible == true, "自检清单关已显示")
@@ -112,9 +117,9 @@ func _run(main: Node) -> void:
 	_check(end_screen.visible == true, "结算页显示")
 	_check(character._pants_on == true, "通关时小人已穿上裤子")
 
-	# 6) 重开
+	# 6) 重开（含走回卧室的过场）
 	end_screen.restart_pressed.emit()
-	await _wait(20)
+	await _seconds(3.0)
 	_check(main._index == 0, "重开后回到第 1 关")
 	_check(main._state == main.State.PLAYING, "重开后状态 PLAYING")
 	_check(absf(character.rotation + PI * 0.5) < 0.01, "重开后小人重新躺回床上")

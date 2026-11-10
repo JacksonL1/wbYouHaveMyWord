@@ -42,6 +42,7 @@ var _state: State = State.FINISHED
 var _prop: Node2D = null
 var _drop_zone: BaseProp = null
 var _cutscene_next := ""   # "level_in" 过场后进关 / "level_out" 过场后切下一关
+var _first_entry := true   # 第一关直接摆放，之后每关之间播放走路过场
 
 
 func _ready() -> void:
@@ -114,8 +115,54 @@ func _start_level(level_index: int) -> void:
 		_finish()
 		return
 
+	_state = State.LOCKED
+	_idle_timer.stop()
+	_binder.set_interactive(false)
+	_binder.hide_ghost()
 	_clear_stage()
 	AudioManager.stop_loop_sfx()
+
+	# ── 场景切换过场（第一关除外）：小人向右走出画面，旧背景淡出 ──
+	if not _first_entry:
+		_character.walk_to(Vector2(1420.0, _character.position.y))
+		var out_tween := create_tween()
+		out_tween.tween_property(_bg, "modulate:a", 0.0, 0.75)
+		await _character.walk_finished
+		if not is_inside_tree():
+			return
+	_first_entry = false
+
+	# ── 摆放新关卡：换背景（自动淡入）、姿态服装、道具、卡片 ──
+	_apply_level(level)
+
+	# ── 小人从画面左侧走进新场景（起床关躺在床上的除外）──
+	if str(level.get("id", "")) != "wake":
+		var target := _character.position
+		_character.position = Vector2(-150.0, target.y)
+		_character.walk_to(target)
+		await _character.walk_finished
+		if not is_inside_tree():
+			return
+
+	# ── 正式开始本关 ──
+	_state = State.PLAYING
+	_restart_idle_timer()
+	_binder.hide_ghost()
+
+	# 关卡间可插入过场视频（story.json 的 video_before / video_after 字段）
+	var video_before := str(level.get("video_before", ""))
+	if not video_before.is_empty() and ResourceLoader.exists(video_before):
+		_state = State.CUTSCENE
+		_binder.set_interactive(false)
+		_cutscene_next = "level_in"
+		_cutscene.play_video(video_before)
+		return
+
+	_play_vo_delayed(_vo(level, "intro"), 0.55)
+
+
+## 摆放一关的全部静态内容（背景 / 小人 / 道具 / 卡片），不含流程启动
+func _apply_level(level: Dictionary) -> void:
 	_apply_background(str(level.get("bg_img", "")))
 	_character.setup_for_level(str(level.get("id", "")))
 
@@ -133,21 +180,6 @@ func _start_level(level_index: int) -> void:
 		var loop_sfx := str(level.get("loop_sfx", ""))
 		if not loop_sfx.is_empty():
 			AudioManager.start_loop_sfx(loop_sfx)
-
-	_state = State.PLAYING
-	_restart_idle_timer()
-	_binder.hide_ghost()
-
-	# 关卡间可插入过场视频（story.json 的 video_before / video_after 字段）
-	var video_before := str(level.get("video_before", ""))
-	if not video_before.is_empty() and ResourceLoader.exists(video_before):
-		_state = State.CUTSCENE
-		_binder.set_interactive(false)
-		_cutscene_next = "level_in"
-		_cutscene.play_video(video_before)
-		return
-
-	_play_vo_delayed(_vo(level, "intro"), 0.55)
 
 
 func _clear_stage() -> void:

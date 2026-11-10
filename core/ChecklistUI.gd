@@ -2,7 +2,8 @@ extends CanvasLayer
 ##
 ## Act 6 · 门前自检清单
 ## =====================
-## 五个徽章按顺序点亮（当前该点的会发光脉冲），点错不惩罚、不推进。
+## 六个徽章排成 3x2 两行网格（放得下就放，放不下自动两行，不硬挤一行），
+## 按顺序点亮（当前该点的会发光脉冲），点错不惩罚、不推进。
 ## 每点亮一个由 Main 播放对应的 vo_act6_badge_N，全部点亮后 emit finished。
 ##
 ## 外部接口：
@@ -15,15 +16,15 @@ signal badge_tapped(index: int)
 signal finished
 
 const BADGES := [
-	{"en": "Water", "cn": "喝水", "img": "res://assets/props/prop_cup.png"},
-	{"en": "Teeth", "cn": "刷牙", "img": "res://assets/props/prop_toothbrush.png"},
-	{"en": "Face", "cn": "洗脸", "img": "res://assets/props/prop_towel.png"},
-	{"en": "Shirt", "cn": "穿衣", "img": "res://assets/props/prop_shirt.png"},
-	{"en": "Pants", "cn": "穿裤", "img": "res://assets/props/prop_pants.png"},
-	{"en": "Shoes", "cn": "穿鞋", "img": "res://assets/props/prop_shoes.png"},
+	{"en": "Water", "img": "res://assets/props/prop_cup.png"},
+	{"en": "Teeth", "img": "res://assets/props/prop_toothbrush.png"},
+	{"en": "Face", "img": "res://assets/props/prop_towel.png"},
+	{"en": "Shirt", "img": "res://assets/props/prop_shirt.png"},
+	{"en": "Pants", "img": "res://assets/props/prop_pants.png"},
+	{"en": "Shoes", "img": "res://assets/props/prop_shoes.png"},
 ]
 
-const CARD_SIZE := Vector2(176, 196)
+const CARD_SIZE := Vector2(190, 214)
 const COLOR_OFF := Color(0.96, 0.94, 0.90, 1.0)
 const COLOR_ON := Color(1.0, 0.86, 0.42, 1.0)
 const BORDER_OFF := Color(0.80, 0.72, 0.62, 1.0)
@@ -31,7 +32,7 @@ const BORDER_ON := Color(0.98, 0.72, 0.22, 1.0)
 const INK := Color(0.29, 0.24, 0.34, 1.0)
 
 @onready var _root: Control = $Root
-@onready var _row: HBoxContainer = $Root/Row
+@onready var _row: GridContainer = $Root/Row
 @onready var _hint: Label = $Root/Hint
 
 var _buttons: Array[Button] = []
@@ -57,7 +58,7 @@ func _build() -> void:
 		_apply_style(btn, false)
 
 		var icon := TextureRect.new()
-		icon.position = Vector2(38, 22)
+		icon.position = Vector2(45, 22)
 		icon.size = Vector2(100, 100)
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -68,27 +69,17 @@ func _build() -> void:
 
 		var en := Label.new()
 		en.text = str(data["en"])
-		en.position = Vector2(0, 124)
-		en.size = Vector2(CARD_SIZE.x, 34)
+		en.position = Vector2(0, 132)
+		en.size = Vector2(CARD_SIZE.x, 36)
 		en.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		en.add_theme_font_size_override("font_size", 27)
+		en.add_theme_font_size_override("font_size", 28)
 		en.add_theme_color_override("font_color", INK)
 		en.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		btn.add_child(en)
 
-		var cn := Label.new()
-		cn.text = str(data["cn"])
-		cn.position = Vector2(0, 156)
-		cn.size = Vector2(CARD_SIZE.x, 26)
-		cn.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		cn.add_theme_font_size_override("font_size", 19)
-		cn.add_theme_color_override("font_color", Color(0.45, 0.40, 0.48, 1.0))
-		cn.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		btn.add_child(cn)
-
 		var check := Label.new()
 		check.text = "✓"
-		check.position = Vector2(126, 2)
+		check.position = Vector2(138, 4)
 		check.size = Vector2(44, 44)
 		check.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		check.add_theme_font_size_override("font_size", 34)
@@ -126,7 +117,7 @@ func start() -> void:
 	_kill_tweens()
 	_current = 0
 	_root.visible = true
-	_hint.text = "按顺序点亮小徽章，就可以出门啦！"
+	_hint.text = "Tap the badges in order, then we can go out!"
 	for i in _buttons.size():
 		_apply_style(_buttons[i], false)
 		_checks[i].visible = false
@@ -161,7 +152,7 @@ func pulse_current() -> void:
 		.set_trans(Tween.TRANS_BACK)
 	_punch_tween.tween_property(b, "scale", Vector2.ONE, 0.26) \
 		.set_trans(Tween.TRANS_BACK)
-	_hint.text = "点这个发光的徽章！"
+	_hint.text = "Tap the glowing badge!"
 
 
 func _on_badge_pressed(index: int) -> void:
@@ -174,7 +165,7 @@ func _on_badge_pressed(index: int) -> void:
 	badge_tapped.emit(index)
 	if _current >= _buttons.size():
 		_kill_tweens()
-		_hint.text = "全部完成！High-five! ✋"
+		_hint.text = "All done! High-five! ✋"
 		finished.emit()
 	else:
 		_start_pulse()

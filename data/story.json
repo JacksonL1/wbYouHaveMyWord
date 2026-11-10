@@ -1,8 +1,7 @@
 [
   {
     "id": "wake",
-    "title": "起床",
-    "title_en": "Wake up",
+    "title": "Wake up",
     "req_card": "card_wake",
     "bg_img": "res://assets/bgs/bg_bedroom.png",
     "prop_img": "res://assets/props/prop_bed.png",
@@ -16,15 +15,29 @@
     "video_before": "",
     "video_after": "",
     "cards": [
-      { "id": "card_wake", "text": "Wake up", "img": "res://assets/props/prop_bed.png", "vo": "wake_up" },
-      { "id": "card_brush", "text": "Brush", "img": "res://assets/props/prop_toothbrush.png", "vo": "brush" },
-      { "id": "card_shoes", "text": "Shoes", "img": "res://assets/props/prop_shoes.png", "vo": "shoes" }
+      {
+        "id": "card_wake",
+        "text": "Wake up",
+        "img": "res://assets/props/prop_bed.png",
+        "vo": "wake_up"
+      },
+      {
+        "id": "card_brush",
+        "text": "Brush",
+        "img": "res://assets/props/prop_toothbrush.png",
+        "vo": "brush"
+      },
+      {
+        "id": "card_shoes",
+        "text": "Shoes",
+        "img": "res://assets/props/prop_shoes.png",
+        "vo": "shoes"
+      }
     ]
   },
   {
     "id": "drink",
-    "title": "喝水",
-    "title_en": "Drink",
+    "title": "Drink",
     "req_card": "card_drink",
     "bg_img": "res://assets/bgs/bg_living.png",
     "prop_img": "res://assets/props/prop_cup.png",
@@ -38,15 +51,29 @@
     "video_before": "",
     "video_after": "",
     "cards": [
-      { "id": "card_drink", "text": "Drink", "img": "res://assets/props/prop_cup.png", "vo": "drink" },
-      { "id": "card_wash", "text": "Wash", "img": "res://assets/props/prop_towel.png", "vo": "wash" },
-      { "id": "card_wake", "text": "Wake up", "img": "res://assets/props/prop_bed.png", "vo": "wake_up" }
+      {
+        "id": "card_drink",
+        "text": "Drink",
+        "img": "res://assets/props/prop_cup.png",
+        "vo": "drink"
+      },
+      {
+        "id": "card_wash",
+        "text": "Wash",
+        "img": "res://assets/props/prop_towel.png",
+        "vo": "wash"
+      },
+      {
+        "id": "card_wake",
+        "text": "Wake up",
+        "img": "res://assets/props/prop_bed.png",
+        "vo": "wake_up"
+      }
     ]
   },
   {
     "id": "brush",
-    "title": "刷牙",
-    "title_en": "Brush",
+    "title": "Brush teeth",
     "req_card": "card_brush",
     "bg_img": "res://assets/bgs/bg_bathroom.png",
     "prop_img": "res://assets/props/prop_toothbrush.png",
@@ -60,15 +87,29 @@
     "video_before": "",
     "video_after": "",
     "cards": [
-      { "id": "card_brush", "text": "Brush", "img": "res://assets/props/prop_toothbrush.png", "vo": "brush" },
-      { "id": "card_drink", "text": "Drink", "img": "res://assets/props/prop_cup.png", "vo": "drink" },
-      { "id": "card_shirt", "text": "Shirt", "img": "res://assets/props/prop_shirt.png", "vo": "shirt" }
+      {
+        "id": "card_brush",
+        "text": "Brush",
+        "img": "res://assets/props/prop_toothbrush.png",
+        "vo": "brush"
+      },
+      {
+        "id": "card_drink",
+        "text": "Drink",
+        "img": "res://assets/props/prop_cup.png",
+        "vo": "drink"
+      },
+      {
+        "id": "card_shirt",
+        "text": "Shirt",
+        "img": "res://assets/props/prop_shirt.png",
+        "vo": "shirt"
+      }
     ]
   },
   {
     "id": "wash",
-    "title": "洗脸",
-    "title_en": "Wash",
+    "title": "Wash face",
     "req_card": "card_wash",
     "bg_img": "res://assets/bgs/bg_bathroom.png",
     "prop_img": "res://assets/props/prop_towel.png",
@@ -83,15 +124,29 @@
     "video_before": "",
     "video_after": "",
     "cards": [
-      { "id": "card_wash", "text": "Wash", "img": "res://assets/props/prop_towel.png", "vo": "wash" },
-      { "id": "card_shoes", "text": "Shoes", "img": "res://assets/props/prop_shoes.png", "vo": "shoes" },
-      { "id": "card_brush", "text": "Brush", "img": "res://assets/props/prop_toothbrush.png", "vo": "brush" }
+      {
+        "id": "card_wash",
+        "text": "Wash",
+        "img": "res://assets/props/prop_towel.png",
+        "vo": "wash"
+      },
+      {
+        "id": "card_shoes",
+        "text": "Shoes",
+        "img": "res://assets/props/prop_shoes.png",
+        "vo": "shoes"
+      },
+      {
+        "id": "card_brush",
+        "text": "Brush",
+        "img": "res://assets/props/prop_toothbrush.png",
+        "vo": "brush"
+      }
     ]
   },
   {
     "id": "shirt",
-    "title": "穿上衣",
-    "title_en": "Shirt",
+    "title": "Put on shirt",
     "req_card": "card_shirt",
     "bg_img": "res://assets/bgs/bg_wardrobe.png",
     "prop_img": "res://assets/props/prop_shirt.png",
@@ -106,15 +161,29 @@
     "video_before": "",
     "video_after": "",
     "cards": [
-      { "id": "card_shirt", "text": "Shirt", "img": "res://assets/props/prop_shirt.png", "vo": "shirt" },
-      { "id": "card_drink", "text": "Drink", "img": "res://assets/props/prop_cup.png", "vo": "drink" },
-      { "id": "card_wake", "text": "Wake up", "img": "res://assets/props/prop_bed.png", "vo": "wake_up" }
+      {
+        "id": "card_shirt",
+        "text": "Shirt",
+        "img": "res://assets/props/prop_shirt.png",
+        "vo": "shirt"
+      },
+      {
+        "id": "card_drink",
+        "text": "Drink",
+        "img": "res://assets/props/prop_cup.png",
+        "vo": "drink"
+      },
+      {
+        "id": "card_wake",
+        "text": "Wake up",
+        "img": "res://assets/props/prop_bed.png",
+        "vo": "wake_up"
+      }
     ]
   },
   {
     "id": "pants",
-    "title": "穿裤子",
-    "title_en": "Pants",
+    "title": "Put on pants",
     "req_card": "card_pants",
     "bg_img": "res://assets/bgs/bg_wardrobe.png",
     "prop_img": "res://assets/props/prop_pants.png",
@@ -129,15 +198,29 @@
     "video_before": "",
     "video_after": "",
     "cards": [
-      { "id": "card_pants", "text": "Pants", "img": "res://assets/props/prop_pants.png", "vo": "pants" },
-      { "id": "card_wash", "text": "Wash", "img": "res://assets/props/prop_towel.png", "vo": "wash" },
-      { "id": "card_shirt", "text": "Shirt", "img": "res://assets/props/prop_shirt.png", "vo": "shirt" }
+      {
+        "id": "card_pants",
+        "text": "Pants",
+        "img": "res://assets/props/prop_pants.png",
+        "vo": "pants"
+      },
+      {
+        "id": "card_wash",
+        "text": "Wash",
+        "img": "res://assets/props/prop_towel.png",
+        "vo": "wash"
+      },
+      {
+        "id": "card_shirt",
+        "text": "Shirt",
+        "img": "res://assets/props/prop_shirt.png",
+        "vo": "shirt"
+      }
     ]
   },
   {
     "id": "shoes",
-    "title": "穿鞋",
-    "title_en": "Shoes",
+    "title": "Put on shoes",
     "req_card": "card_shoes",
     "bg_img": "res://assets/bgs/bg_entry.png",
     "prop_img": "res://assets/props/prop_shoes.png",
@@ -151,16 +234,30 @@
     "video_before": "",
     "video_after": "",
     "cards": [
-      { "id": "card_shoes", "text": "Shoes", "img": "res://assets/props/prop_shoes.png", "vo": "shoes" },
-      { "id": "card_wash", "text": "Wash", "img": "res://assets/props/prop_towel.png", "vo": "wash" },
-      { "id": "card_pants", "text": "Pants", "img": "res://assets/props/prop_pants.png", "vo": "pants" }
+      {
+        "id": "card_shoes",
+        "text": "Shoes",
+        "img": "res://assets/props/prop_shoes.png",
+        "vo": "shoes"
+      },
+      {
+        "id": "card_wash",
+        "text": "Wash",
+        "img": "res://assets/props/prop_towel.png",
+        "vo": "wash"
+      },
+      {
+        "id": "card_pants",
+        "text": "Pants",
+        "img": "res://assets/props/prop_pants.png",
+        "vo": "pants"
+      }
     ]
   },
   {
     "id": "checklist",
     "kind": "checklist",
-    "title": "门前检查",
-    "title_en": "Check the list",
+    "title": "Check the list",
     "bg_img": "res://assets/bgs/bg_entry.png",
     "vo": {
       "intro": "vo_act6_checklist",

@@ -11,18 +11,24 @@ extends Node2D
 ##   play_success(level_id)      选对后播放本关动作动画（刷牙/喝水/穿衣…）
 ##   play_wrong()                拖错时的轻微摇头
 ##   stop_action()               停止循环表现（Zzz / 泡泡）
+##   walk_to(target)             走路到目标点（场景切换过场），完成后 emit walk_finished
 ##
 ## 姿态约定：
 ##   躺下 = rotation -90° + BED_POS（头朝左，正好落在枕头位置）
 ##   站立 = rotation   0° + STAND_POS（床左侧，不遮挡中央道具拖拽热区）
 ##
 
+signal walk_finished
+
 const CHAR_DIR := "res://assets/character/"
 const STAND_POS := Vector2(330.0, 500.0)
 const BED_POS := Vector2(760.0, 390.0)
 const BASE_SCALE := 0.72
 const HEAD_Y := -250.0
+const BODY_POS := Vector2(0.0, -150.0)
 const LYING_ROT := -PI * 0.5
+## 走路速度（px/s），过场里小人换房间时用
+const WALK_SPEED := 860.0
 
 ## 通关后需要的停留时长（起床动画最长）
 const SUCCESS_HOLD := {
@@ -54,6 +60,10 @@ var _action_tween: Tween
 var _breathe_tween: Tween
 var _fx_tween: Tween
 var _arm_tween: Tween
+var _walk_tween: Tween
+var _walk_legs_tween: Tween
+var _walk_arms_tween: Tween
+var _walk_bob_tween: Tween
 var _bubble_time := 0.0
 var _level_id := ""
 var _dressed := false
@@ -100,7 +110,7 @@ func _build() -> void:
 	add_child(_shoe_r)
 
 	# 躯干
-	_body = _sprite("body_pajama.png", Vector2(0, -150))
+	_body = _sprite("body_pajama.png", BODY_POS)
 	add_child(_body)
 
 	# 手臂：Node2D 当肩关节（旋转轴），Sprite 挂在下方
@@ -178,6 +188,7 @@ func _reset_limbs() -> void:
 	_leg_l.rotation = 0.0
 	_leg_r.rotation = 0.0
 	_head.position = Vector2(0, HEAD_Y)
+	_body.position = BODY_POS
 
 
 func reset_to_stand() -> void:
@@ -223,9 +234,9 @@ func setup_for_level(level_id: String) -> void:
 		_zzz.rotation = -LYING_ROT
 		_zzz_float()
 	elif level_id == "checklist":
-		# 清单关：小人缩小站到画面下方中央，避开六个徽章
+		# 清单关：小人缩小站到画面右下角，避开居中的徽章区
 		rotation = 0.0
-		position = Vector2(640.0, 686.0)
+		position = Vector2(1105.0, 620.0)
 		scale = Vector2.ONE * 0.62
 		_set_face("happy")
 		_zzz.visible = false
@@ -483,13 +494,80 @@ func play_wrong() -> void:
 	t.tween_property(_head, "rotation", 0.0, 0.12)
 
 
+# --------------------------------------------------------------------------
+# 走路（场景切换过场）
+# 腿臂交替摆动 + 身体颠步，沿直线走向目标；走完 emit walk_finished。
+# 被打断（如进新关卡 setup_for_level）时不会 emit，调用方需自行兜底。
+# --------------------------------------------------------------------------
+func walk_to(target: Vector2) -> void:
+	stop_action()
+	if _breathe_tween and _breathe_tween.is_valid():
+		_breathe_tween.kill()
+	if _main_tween and _main_tween.is_valid():
+		_main_tween.kill()
+	_leg_l.rotation = 0.0
+	_leg_r.rotation = 0.0
+	_arm_l.rotation = 0.0
+	_arm_r.rotation = 0.0
+	_body.position = BODY_POS
+	_zzz.visible = false
+	_set_face("happy")
+	# 贴纸风正面小人：按行走方向做水平镜像
+	var dir := signf(target.x - position.x)
+	if dir != 0.0:
+		scale.x = absf(scale.x) * dir
+
+	_walk_legs_tween = create_tween().set_loops()
+	_walk_legs_tween.tween_property(_leg_l, "rotation", 0.42, 0.15)
+	_walk_legs_tween.parallel().tween_property(_leg_r, "rotation", -0.42, 0.15)
+	_walk_legs_tween.tween_property(_leg_l, "rotation", -0.42, 0.15)
+	_walk_legs_tween.parallel().tween_property(_leg_r, "rotation", 0.42, 0.15)
+
+	_walk_arms_tween = create_tween().set_loops()
+	_walk_arms_tween.tween_property(_arm_l, "rotation", -0.3, 0.15)
+	_walk_arms_tween.parallel().tween_property(_arm_r, "rotation", 0.3, 0.15)
+	_walk_arms_tween.tween_property(_arm_l, "rotation", 0.3, 0.15)
+	_walk_arms_tween.parallel().tween_property(_arm_r, "rotation", -0.3, 0.15)
+
+	_walk_bob_tween = create_tween().set_loops()
+	_walk_bob_tween.tween_property(_body, "position:y", BODY_POS.y - 7.0, 0.15)
+	_walk_bob_tween.tween_property(_body, "position:y", BODY_POS.y, 0.15)
+
+	var dist := absf(target.x - position.x)
+	var dur := clampf(dist / WALK_SPEED, 0.35, 2.4)
+	_walk_tween = create_tween()
+	_walk_tween.tween_property(self, "position", target, dur)
+	_walk_tween.tween_callback(_stop_walking)
+
+
+func _stop_walking() -> void:
+	for tw in [_walk_tween, _walk_legs_tween, _walk_arms_tween, _walk_bob_tween]:
+		if tw and tw.is_valid():
+			tw.kill()
+	_walk_tween = null
+	_walk_legs_tween = null
+	_walk_arms_tween = null
+	_walk_bob_tween = null
+	_leg_l.rotation = 0.0
+	_leg_r.rotation = 0.0
+	_arm_l.rotation = 0.0
+	_arm_r.rotation = 0.0
+	_body.position = BODY_POS
+	scale.x = absf(scale.x)
+	_start_breathe()
+	walk_finished.emit()
+
+
 func _kill_all() -> void:
-	for tw in [_main_tween, _action_tween, _breathe_tween, _fx_tween, _arm_tween]:
+	for tw in [_main_tween, _action_tween, _breathe_tween, _fx_tween, _arm_tween,
+			_walk_tween, _walk_legs_tween, _walk_arms_tween, _walk_bob_tween]:
 		if tw and tw.is_valid():
 			tw.kill()
 	_zzz.visible = false
 	_bubbles.visible = false
 	for b in _bubble_sprites:
 		(b as Sprite2D).modulate.a = 0.0
+	_body.position = BODY_POS
 	_body.rotation = 0.0
 	_head.rotation = 0.0
+	scale.x = absf(scale.x)  # 走路镜像复位

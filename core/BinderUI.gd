@@ -211,5 +211,5 @@ func _on_card_drag_started(card_id: String) -> void:
 
 func _on_mute_pressed() -> void:
 	var muted := AudioManager.toggle_mute()
-	_mute_btn.text = "静音" if muted else "声音"
+	_mute_btn.text = "Muted" if muted else "Sound"
 	_mute_btn.modulate = Color(1, 1, 1, 0.55) if muted else Color(1, 1, 1, 1)

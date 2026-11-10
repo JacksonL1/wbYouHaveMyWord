@@ -124,7 +124,7 @@ offset_top = 248.0
 offset_bottom = 300.0
 theme_override_colors/font_color = Color(0.286, 0.243, 0.341, 0.8)
 theme_override_font_sizes/font_size = 28
-text = "早上好！全部完成"
+text = "Good job! All done!"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -148,4 +148,4 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
-text = "再玩一次 Play again"
+text = "Play Again"
