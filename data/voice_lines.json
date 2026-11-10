@@ -1,0 +1,45 @@
+{
+  "_comment": "情境配音台词表。key = 文件名(不含 .mp3)，value = [台词, 语速]。由 tools/gen_vo_lines.py 用 edge-tts 合成，voice_lines 与 story.json 的 vo 字段通过 key 关联。",
+  "vo_act1_intro": ["Good morning! Wake up, sleepyhead! Rise and shine!", "-15%"],
+  "vo_act1_action": ["Sit up! Wake up!", "-10%"],
+  "vo_act1_done": ["Yay! You are awake!", "+0%"],
+  "vo_timeout_act1": ["Swipe up! Let's get up!", "-10%"],
+
+  "vo_act1_5_intro": ["Good morning! Time to drink water! A warm cup for your tummy!", "-15%"],
+  "vo_act1_5_action": ["Pick up the cup! Drink, drink, gulp gulp!", "-5%"],
+  "vo_act1_5_sip": ["Gulp! Gulp! Ahh, Refreshing!", "+0%"],
+  "vo_act1_5_done": ["All done! Good job! You drank water!", "+0%"],
+  "vo_timeout_act1_5": ["Tap the cup! Let's drink water!", "-10%"],
+
+  "vo_act2_intro": ["Time to brush your teeth! Let's get the toothpaste!", "-15%"],
+  "vo_act2_brush_l": ["Brush left! Choo-choo!", "+0%"],
+  "vo_act2_brush_r": ["Brush right! Swish-swish!", "+0%"],
+  "vo_act2_brush_all": ["Brush, brush, brush your teeth!", "+0%"],
+  "vo_act2_done": ["Sparkling clean! Good brushing!", "+0%"],
+  "vo_timeout_act2": ["Slide your finger! Brush, brush!", "-10%"],
+
+  "vo_act3_intro": ["Water on! Let's wash your face!", "-15%"],
+  "vo_act3_wash_loop": ["Wash, wash, splash-splash!", "+0%"],
+  "vo_act3_done": ["Fresh and clean! Great wash!", "+0%"],
+  "vo_timeout_act3": ["Rub the towel to wash your face!", "-10%"],
+
+  "vo_act4_intro": ["Look outside, it's sunny! Put on your shirt!", "-15%"],
+  "vo_act4_wrong": ["Oh no! Phew! Too hot! Not the heavy coat! Put on the yellow shirt!", "-5%"],
+  "vo_act4_done": ["Awesome! You put on your shirt!", "+0%"],
+  "vo_timeout_act4": ["Where is the yellow shirt? Tap it!", "-10%"],
+
+  "vo_act5_intro": ["Left shoe, right shoe! Put on your shoes!", "-15%"],
+  "vo_act5_shoe_l": ["Put on the left shoe! Snap!", "+0%"],
+  "vo_act5_shoe_r": ["Put on the right shoe! Snap!", "+0%"],
+  "vo_act5_done": ["One, two, ready to run! Shoes are put on!", "+0%"],
+  "vo_timeout_act5": ["Drag the shoe to your foot!", "-10%"],
+
+  "vo_act6_checklist": ["Wait! Check the list! Tap the badges!", "-10%"],
+  "vo_act6_badge_0": ["Water? Drink, done!", "+0%"],
+  "vo_act6_badge_1": ["Teeth? Brush, done!", "+0%"],
+  "vo_act6_badge_2": ["Face? Wash, done!", "+0%"],
+  "vo_act6_badge_3": ["Shirt? Put on, done!", "+0%"],
+  "vo_act6_badge_4": ["Shoes? Put on, done!", "+0%"],
+  "vo_act6_finish": ["All done! Give me a high-five! Let's go to school!", "+5%"],
+  "vo_timeout_act6": ["Tap the glowing badge to check!", "-10%"]
+}

@@ -8,6 +8,13 @@
     "prop_img": "res://assets/props/prop_bed.png",
     "prop_y": 370,
     "prop_scale": 1.0,
+    "vo": {
+      "intro": "vo_act1_intro",
+      "action": ["vo_act1_action"],
+      "done": "vo_act1_done",
+      "timeout": "vo_timeout_act1"
+    },
+    "action_interval": 7.0,
     "cards": [
       { "id": "card_wake", "text": "Wake up", "img": "res://assets/props/prop_bed.png", "vo": "wake_up" },
       { "id": "card_brush", "text": "Brush", "img": "res://assets/props/prop_toothbrush.png", "vo": "brush" },
@@ -23,6 +30,13 @@
     "prop_img": "res://assets/props/prop_cup.png",
     "prop_y": 391,
     "prop_scale": 1.15,
+    "vo": {
+      "intro": "vo_act1_5_intro",
+      "action": ["vo_act1_5_action", "vo_act1_5_sip"],
+      "done": "vo_act1_5_done",
+      "timeout": "vo_timeout_act1_5"
+    },
+    "action_interval": 7.0,
     "cards": [
       { "id": "card_drink", "text": "Drink", "img": "res://assets/props/prop_cup.png", "vo": "drink" },
       { "id": "card_wash", "text": "Wash", "img": "res://assets/props/prop_towel.png", "vo": "wash" },
@@ -38,6 +52,14 @@
     "prop_img": "res://assets/props/prop_toothbrush.png",
     "prop_y": 365,
     "prop_scale": 1.0,
+    "vo": {
+      "intro": "vo_act2_intro",
+      "action": ["vo_act2_brush_l", "vo_act2_brush_r", "vo_act2_brush_all"],
+      "done": "vo_act2_done",
+      "timeout": "vo_timeout_act2"
+    },
+    "action_interval": 3.6,
+    "loop_sfx": "brush_swish",
     "cards": [
       { "id": "card_brush", "text": "Brush", "img": "res://assets/props/prop_toothbrush.png", "vo": "brush" },
       { "id": "card_drink", "text": "Drink", "img": "res://assets/props/prop_cup.png", "vo": "drink" },
@@ -53,6 +75,14 @@
     "prop_img": "res://assets/props/prop_towel.png",
     "prop_y": 390,
     "prop_scale": 1.0,
+    "vo": {
+      "intro": "vo_act3_intro",
+      "action": ["vo_act3_wash_loop"],
+      "done": "vo_act3_done",
+      "timeout": "vo_timeout_act3"
+    },
+    "action_interval": 5.5,
+    "success_sfx": "splash",
     "cards": [
       { "id": "card_wash", "text": "Wash", "img": "res://assets/props/prop_towel.png", "vo": "wash" },
       { "id": "card_shoes", "text": "Shoes", "img": "res://assets/props/prop_shoes.png", "vo": "shoes" },
@@ -68,6 +98,14 @@
     "prop_img": "res://assets/props/prop_shirt.png",
     "prop_y": 375,
     "prop_scale": 1.0,
+    "vo": {
+      "intro": "vo_act4_intro",
+      "action": [],
+      "done": "vo_act4_done",
+      "timeout": "vo_timeout_act4",
+      "wrong": "vo_act4_wrong"
+    },
+    "action_interval": 7.0,
     "cards": [
       { "id": "card_shirt", "text": "Shirt", "img": "res://assets/props/prop_shirt.png", "vo": "shirt" },
       { "id": "card_drink", "text": "Drink", "img": "res://assets/props/prop_cup.png", "vo": "drink" },
@@ -83,10 +121,37 @@
     "prop_img": "res://assets/props/prop_shoes.png",
     "prop_y": 412,
     "prop_scale": 1.1,
+    "vo": {
+      "intro": "vo_act5_intro",
+      "action": ["vo_act5_shoe_l", "vo_act5_shoe_r"],
+      "done": "vo_act5_done",
+      "timeout": "vo_timeout_act5"
+    },
+    "action_interval": 6.5,
     "cards": [
       { "id": "card_shoes", "text": "Shoes", "img": "res://assets/props/prop_shoes.png", "vo": "shoes" },
       { "id": "card_wash", "text": "Wash", "img": "res://assets/props/prop_towel.png", "vo": "wash" },
       { "id": "card_shirt", "text": "Shirt", "img": "res://assets/props/prop_shirt.png", "vo": "shirt" }
     ]
+  },
+  {
+    "id": "checklist",
+    "kind": "checklist",
+    "title": "门前检查",
+    "title_en": "Check the list",
+    "bg_img": "res://assets/bgs/bg_entry.png",
+    "vo": {
+      "intro": "vo_act6_checklist",
+      "done": "vo_act6_finish",
+      "timeout": "vo_timeout_act6"
+    },
+    "badge_vo": [
+      "vo_act6_badge_0",
+      "vo_act6_badge_1",
+      "vo_act6_badge_2",
+      "vo_act6_badge_3",
+      "vo_act6_badge_4"
+    ],
+    "action_interval": 8.0
   }
 ]

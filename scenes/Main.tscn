@@ -1,8 +1,10 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://core/Main.gd" id="1_main"]
 [ext_resource type="PackedScene" path="res://scenes/BinderUI.tscn" id="2_binder"]
 [ext_resource type="PackedScene" path="res://scenes/EndScreen.tscn" id="3_end"]
+[ext_resource type="PackedScene" path="res://scenes/Character.tscn" id="4_char"]
+[ext_resource type="PackedScene" path="res://scenes/ChecklistUI.tscn" id="5_checklist"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
@@ -16,7 +18,11 @@ stretch_mode = 0
 
 [node name="PropLayer" type="Node2D" parent="."]
 
+[node name="Character" parent="." instance=ExtResource("4_char")]
+
 [node name="BinderUI" parent="." instance=ExtResource("2_binder")]
+
+[node name="ChecklistUI" parent="." instance=ExtResource("5_checklist")]
 
 [node name="EndScreen" parent="." instance=ExtResource("3_end")]
 

@@ -1,7 +1,8 @@
 extends Node
-## MVP 冒烟测试（headless 可跑）
+## 冒烟测试（headless 可跑）
 ## 用法：Godot_console.exe --path <project> res://tools/SmokeTest.tscn
-## 覆盖：story.json 加载 / 卡片装配 / 拖错反馈 / 拖对过关 / 幽灵小手提示 / 通关结算 / 重开
+## 覆盖：story 加载 / 卡片装配 / 小人初始姿态 / 拖错反馈 / 拖对过关 /
+##       情境配音配置 / 幽灵小手提示 / 自检清单 / 通关结算 / 重开
 
 var _fails := 0
 
@@ -15,12 +16,20 @@ func _ready() -> void:
 func _run(main: Node) -> void:
 	var binder: Node = main.get_node("BinderUI")
 	var end_screen: Node = main.get_node("EndScreen")
+	var character: Node = main.get_node("Character")
+	var checklist: Node = main.get_node("ChecklistUI")
 
 	await _wait(40)
-	_check(main._levels.size() == 6, "story.json 加载 6 关")
+	_check(main._levels.size() == 7, "story.json 加载 7 关（含自检清单）")
 	_check(main._state == main.State.PLAYING, "初始状态 PLAYING")
 	_check(binder.get_card(main._current_level().get("req_card")) != null, "正确卡片已装配")
 	_check(binder.get_card("card_wake") != null, "第 1 关卡片包含 Wake up")
+	_check(character != null and character._head != null, "小人角色已构建")
+	_check(absf(character.rotation + PI * 0.5) < 0.01, "第 1 关小人躺在床上")
+	_check(character._faces["asleep"].visible == true, "躺下时是闭眼表情")
+	_check(checklist != null and checklist._buttons.size() == 5, "自检清单有 5 个徽章")
+	_check(str(main._current_level().get("vo", {}).get("intro", "")) == "vo_act1_intro",
+			"情境配音配置已接入 story.json")
 
 	var prop: Node = main.get_node("PropLayer").get_child(0)
 	var zone: BaseProp = prop.get_node("DropZone")
@@ -50,25 +59,32 @@ func _run(main: Node) -> void:
 	await _wait(2)
 	_check(ghost.visible == false, "开始拖拽后隐藏小手")
 
-	# 4) 拖对卡片 → matched，1.5s 后自动进下一关
+	# 4) 拖对卡片 → 起床动画（3s）后自动进下一关
 	zone._drop_data(Vector2.ZERO, {"card_id": "card_wake"})
 	await _wait(10)
 	_check(main._state == main.State.LOCKED, "匹配成功进入 LOCKED")
-	await _seconds(2.0)
-	_check(main._index == 1, "1.5s 后自动进入第 2 关")
+	await _seconds(3.4)
+	_check(main._index == 1, "起床动画结束后进入第 2 关")
 	_check(main._state == main.State.PLAYING, "新关卡回到 PLAYING")
+	_check(character.rotation == 0.0, "小人已站起")
 
-	# 5) 连通全流程直至结算
+	# 5) 连通全流程直至结算（清单关改为点徽章）
 	var guard := 0
 	while main._state != main.State.FINISHED and guard < 40:
+		guard += 1
 		var lv: Dictionary = main._current_level()
+		if str(lv.get("kind", "")) == "checklist":
+			_check(checklist._root.visible == true, "自检清单关已显示")
+			for i in 5:
+				checklist._on_badge_pressed(i)
+			await _seconds(2.6)
+			continue
 		var req := str(lv.get("req_card", ""))
 		var p: Node = main.get_node("PropLayer").get_child(0)
 		var z: BaseProp = p.get_node("DropZone")
 		z._drop_data(Vector2.ZERO, {"card_id": req})
-		await _seconds(2.0)
-		guard += 1
-	_check(main._state == main.State.FINISHED, "6 关全部匹配完成")
+		await _seconds(2.3)
+	_check(main._state == main.State.FINISHED, "全部 7 关完成")
 	_check(end_screen.visible == true, "结算页显示")
 
 	# 6) 重开
@@ -76,6 +92,7 @@ func _run(main: Node) -> void:
 	await _wait(20)
 	_check(main._index == 0, "重开后回到第 1 关")
 	_check(main._state == main.State.PLAYING, "重开后状态 PLAYING")
+	_check(absf(character.rotation + PI * 0.5) < 0.01, "重开后小人重新躺回床上")
 
 	print("SMOKE RESULT: %s (%d 失败)" % ["PASS" if _fails == 0 else "FAIL", _fails])
 	get_tree().quit(0 if _fails == 0 else 1)

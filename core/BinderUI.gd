@@ -86,6 +86,13 @@ func set_interactive(value: bool) -> void:
 			(card as WordCard).set_draggable(value)
 
 
+## 清单关（Act 6）只需要顶部标题栏，隐藏底部单词本面板
+func set_card_panel_visible(value: bool) -> void:
+	_panel.visible = value
+	if not value:
+		hide_ghost()
+
+
 func get_card(card_id: String) -> WordCard:
 	return _cards.get(card_id, null) as WordCard
 
