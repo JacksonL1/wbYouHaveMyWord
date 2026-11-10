@@ -29,6 +29,8 @@ PAJAMA = PALETTE["sun"]
 PAJAMA_D = darken(PAJAMA, 0.18)
 SHIRT = PALETTE["blue"]
 SHIRT_L = PALETTE["blue_l"]
+PANTS = "#5B8DD9"
+PANTS_D = darken(PANTS, 0.14)
 
 
 def _save(c, name, outline=True, ow=5):
@@ -171,6 +173,17 @@ def leg():
     _save(c, "leg.png", True, 4)
 
 
+def leg_pants():
+    """穿上裤子后的腿：牛仔长裤盖到脚踝（睡衣小腿 → 长裤）"""
+    c = Cv((46, 104))
+    c.rrect((4, 0, 42, 80), 12, PANTS)
+    c.rrect((4, 34, 42, 46), 6, PANTS_D)
+    # 裤脚 + 脚踝
+    c.rrect((4, 72, 42, 86), 8, PANTS_D)
+    c.rrect((4, 78, 44, 100), 12, SKIN_D)
+    _save(c, "leg_pants.png", True, 4)
+
+
 def shoe():
     c = Cv((66, 40))
     c.rrect((2, 24, 64, 38), 10, "#FFFFFF")
@@ -221,6 +234,18 @@ def mini_shirt():
     _save(c, "mini_shirt.png", True, 3)
 
 
+def mini_pants():
+    """手持小裤子（通关动画里举起再穿上）"""
+    c = Cv((96, 100))
+    # 双腿
+    c.rrect((16, 30, 44, 92), 10, PANTS)
+    c.rrect((52, 30, 80, 92), 10, PANTS)
+    # 裤腰 + 臀
+    c.rrect((12, 4, 84, 42), 12, PANTS)
+    c.rect((12, 14, 84, 22), PANTS_D)
+    _save(c, "mini_pants.png", True, 3)
+
+
 def mini_shoe():
     c = Cv((90, 60))
     c.rrect((4, 40, 84, 56), 10, "#FFFFFF")
@@ -255,8 +280,8 @@ def main():
     print("[character] 生成小人部件…")
     for fn in (head, face_awake, face_asleep, face_brush, face_happy,
                lambda: body(False), lambda: body(True),
-               arm, leg, shoe, mini_brush, mini_cup, mini_towel,
-               mini_shirt, mini_shoe, bubble, zzz):
+               arm, leg, leg_pants, shoe, mini_brush, mini_cup, mini_towel,
+               mini_shirt, mini_pants, mini_shoe, bubble, zzz):
         fn()
     print("[character] done. ->", OUT)
 

@@ -28,6 +28,11 @@
   "vo_act4_done": ["Awesome! You put on your shirt!", "+0%"],
   "vo_timeout_act4": ["Where is the yellow shirt? Tap it!", "-10%"],
 
+  "vo_act4_5_intro": ["Almost dressed! Now put on your pants!", "-15%"],
+  "vo_act4_5_wrong": ["Oops! Those are not pants! Find the blue pants!", "-5%"],
+  "vo_act4_5_done": ["Great! Pants are on! You look so cool!", "+0%"],
+  "vo_timeout_act4_5": ["Find the blue pants and drag them over!", "-10%"],
+
   "vo_act5_intro": ["Left shoe, right shoe! Put on your shoes!", "-15%"],
   "vo_act5_shoe_l": ["Put on the left shoe! Snap!", "+0%"],
   "vo_act5_shoe_r": ["Put on the right shoe! Snap!", "+0%"],
@@ -39,6 +44,7 @@
   "vo_act6_badge_1": ["Teeth? Brush, done!", "+0%"],
   "vo_act6_badge_2": ["Face? Wash, done!", "+0%"],
   "vo_act6_badge_3": ["Shirt? Put on, done!", "+0%"],
+  "vo_act6_badge_4_pants": ["Pants? Put on, done!", "+0%"],
   "vo_act6_badge_4": ["Shoes? Put on, done!", "+0%"],
   "vo_act6_finish": ["All done! Give me a high-five! Let's go to school!", "+5%"],
   "vo_timeout_act6": ["Tap the glowing badge to check!", "-10%"]

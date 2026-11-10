@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dmfroignbk2so"
-path="res://.godot/imported/bg_bathroom_warm.png-9c8045ed81c554f24972b22645967382.ctex"
+uid="uid://wy4qjy4io7he"
+path="res://.godot/imported/bg_living.png-a34431c7012c6f17a046880a144d3900.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/bgs/bg_bathroom_warm.png"
-dest_files=["res://.godot/imported/bg_bathroom_warm.png-9c8045ed81c554f24972b22645967382.ctex"]
+source_file="res://assets/bgs/bg_living.png"
+dest_files=["res://.godot/imported/bg_living.png-a34431c7012c6f17a046880a144d3900.ctex"]
 
 [params]
 

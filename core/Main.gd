@@ -4,12 +4,14 @@ extends Node2D
 ## 职责：
 ##   1. 读取 data/story.json，按数据驱动的方式搭建每一关（背景 / 道具 / 卡片 / 小人）；
 ##   2. 监听道具接收器与清单徽章的信号，驱动关卡流转；
-##   3. 按 story.json 的 vo 配置播放情境配音、循环动作音与 BGM；
-##   4. 维护 10 秒空闲计时器 + 幽灵小手提示（零挫败感状态机）。
+##   3. 播放一次性情境配音（进关 intro / 通关 done / 超时 timeout）与 BGM；
+##   4. 支持关卡间插入过场视频（video_before / video_after）；
+##   5. 维护 10 秒空闲计时器 + 幽灵小手提示（零挫败感状态机）。
 ##
 ## 状态机：
-##   PLAYING  —— 可操作，计时器与情境语音循环运行
+##   PLAYING  —— 可操作，计时器运行
 ##   LOCKED   —— 本关已完成，播放反馈动画后进入下一关
+##   CUTSCENE —— 过场动画播放中（关卡间可插入视频）
 ##   FINISHED —— 全流程完成，显示结算页
 
 const STORY_PATH := "res://data/story.json"
@@ -19,13 +21,11 @@ const PROP_SCENE := preload("res://scenes/Prop.tscn")
 const HINT_DELAY := 10.0
 ## 默认匹配成功后停留多久再进下一关（小人动画长的关卡会自行覆盖）
 const MATCH_DELAY := 1.5
-## 情境台词在孩子刚操作完多久内不插话，避免打断（毫秒）
-const VO_QUIET_MS := 2600
 ## 舞台中心（道具锚点 X）
 const STAGE_X := 640.0
 const CHECKLIST_KIND := "checklist"
 
-enum State { PLAYING, LOCKED, FINISHED }
+enum State { PLAYING, LOCKED, CUTSCENE, FINISHED }
 
 @onready var _bg: TextureRect = $Background
 @onready var _prop_layer: Node2D = $PropLayer
@@ -34,15 +34,14 @@ enum State { PLAYING, LOCKED, FINISHED }
 @onready var _end_screen = $EndScreen
 @onready var _character: Character = $Character
 @onready var _checklist = $ChecklistUI
+@onready var _cutscene = $Cutscene
 
 var _levels: Array = []
 var _index := 0
 var _state: State = State.FINISHED
 var _prop: Node2D = null
 var _drop_zone: BaseProp = null
-var _action_vo_timer: Timer
-var _action_vo_i := 0
-var _last_input_ms := 0
+var _cutscene_next := ""   # "level_in" 过场后进关 / "level_out" 过场后切下一关
 
 
 func _ready() -> void:
@@ -58,12 +57,7 @@ func _ready() -> void:
 	_end_screen.restart_pressed.connect(_on_restart_requested)
 	_checklist.badge_tapped.connect(_on_badge_tapped)
 	_checklist.finished.connect(_on_checklist_finished)
-
-	_action_vo_timer = Timer.new()
-	_action_vo_timer.name = "ActionVoTimer"
-	_action_vo_timer.one_shot = false
-	add_child(_action_vo_timer)
-	_action_vo_timer.timeout.connect(_on_action_vo_timeout)
+	_cutscene.finished.connect(_on_cutscene_finished)
 
 	AudioManager.play_bgm()
 	_start_level(0)
@@ -75,7 +69,6 @@ func _input(event: InputEvent) -> void:
 		return
 	if (event is InputEventMouseButton and (event as InputEventMouseButton).pressed) \
 			or (event is InputEventScreenTouch and (event as InputEventScreenTouch).pressed):
-		_last_input_ms = Time.get_ticks_msec()
 		_restart_idle_timer()
 
 
@@ -111,16 +104,6 @@ func _vo(level: Dictionary, key: String) -> String:
 	return str((raw as Dictionary).get(key, ""))
 
 
-func _vo_actions(level: Dictionary) -> Array:
-	var raw: Variant = level.get("vo", {})
-	if typeof(raw) != TYPE_DICTIONARY:
-		return []
-	var pool: Variant = (raw as Dictionary).get("action", [])
-	if typeof(pool) != TYPE_ARRAY:
-		return []
-	return pool as Array
-
-
 # --------------------------------------------------------------------------
 # 关卡装配
 # --------------------------------------------------------------------------
@@ -133,8 +116,6 @@ func _start_level(level_index: int) -> void:
 
 	_clear_stage()
 	AudioManager.stop_loop_sfx()
-	_action_vo_timer.stop()
-	_action_vo_i = 0
 	_apply_background(str(level.get("bg_img", "")))
 	_character.setup_for_level(str(level.get("id", "")))
 
@@ -156,8 +137,16 @@ func _start_level(level_index: int) -> void:
 	_state = State.PLAYING
 	_restart_idle_timer()
 	_binder.hide_ghost()
-	_last_input_ms = Time.get_ticks_msec()
-	_action_vo_timer.start(float(level.get("action_interval", 6.0)))
+
+	# 关卡间可插入过场视频（story.json 的 video_before / video_after 字段）
+	var video_before := str(level.get("video_before", ""))
+	if not video_before.is_empty() and ResourceLoader.exists(video_before):
+		_state = State.CUTSCENE
+		_binder.set_interactive(false)
+		_cutscene_next = "level_in"
+		_cutscene.play_video(video_before)
+		return
+
 	_play_vo_delayed(_vo(level, "intro"), 0.55)
 
 
@@ -226,18 +215,17 @@ func _play_vo_delayed(line: String, delay: float) -> void:
 		AudioManager.play_vo(line)
 
 
-## 关卡进行中轮换播放动作台词（刷刷 / 擦脸 / 穿左右鞋…）
-func _on_action_vo_timeout() -> void:
-	if _state != State.PLAYING:
-		return
-	# 孩子正在操作时不插话
-	if Time.get_ticks_msec() - _last_input_ms < VO_QUIET_MS:
-		return
-	var pool := _vo_actions(_current_level())
-	if pool.is_empty():
-		return
-	AudioManager.play_vo(str(pool[_action_vo_i % pool.size()]))
-	_action_vo_i += 1
+## 过场动画结束：回到本关（level_in）或进入下一关（level_out）
+func _on_cutscene_finished() -> void:
+	var level := _current_level()
+	if _cutscene_next == "level_in":
+		_state = State.PLAYING
+		_binder.set_interactive(not _is_checklist(level))
+		_restart_idle_timer()
+		_play_vo_delayed(_vo(level, "intro"), 0.4)
+	elif _cutscene_next == "level_out":
+		_advance()
+	_cutscene_next = ""
 
 
 # --------------------------------------------------------------------------
@@ -248,7 +236,6 @@ func _on_prop_matched(_prop_id: String, card_id: String) -> void:
 		return
 	_state = State.LOCKED
 	_idle_timer.stop()
-	_action_vo_timer.stop()
 	AudioManager.stop_loop_sfx()
 	_binder.hide_ghost()
 	_binder.set_interactive(false)
@@ -261,13 +248,38 @@ func _on_prop_matched(_prop_id: String, card_id: String) -> void:
 		AudioManager.play_sfx(success_sfx)
 
 	_character.play_success(str(level.get("id", "")))
+	# 道具飞向小人并淡出（起床关的床保留在原地）
+	if str(level.get("id", "")) != "wake":
+		_dismiss_prop()
 	_play_vo_delayed(_vo(level, "done"), 0.62)
 
 	var hold: float = maxf(MATCH_DELAY, _character.get_success_hold())
 	await get_tree().create_timer(hold).timeout
 	if not is_inside_tree():
 		return
-	_advance()
+
+	# 通关后可插入过场视频（如刷牙教学视频）
+	var video_after := str(_current_level().get("video_after", ""))
+	if not video_after.is_empty() and ResourceLoader.exists(video_after):
+		_state = State.CUTSCENE
+		_cutscene_next = "level_out"
+		_cutscene.play_video(video_after)
+	else:
+		_advance()
+
+
+## 道具飞向角色并淡出，把舞台留给通关动作动画
+func _dismiss_prop() -> void:
+	if _prop == null or not is_instance_valid(_prop):
+		return
+	var target: Vector2 = _character.position + Vector2(0, -150)
+	var t := create_tween()
+	t.set_parallel(true)
+	t.tween_property(_prop, "position", target, 0.45) \
+		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	t.tween_property(_prop, "scale", _prop.scale * 0.4, 0.45) \
+		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	t.tween_property(_prop, "modulate:a", 0.0, 0.5)
 
 
 func _on_prop_mismatched(_prop_id: String, _card_id: String) -> void:
@@ -278,7 +290,6 @@ func _on_prop_mismatched(_prop_id: String, _card_id: String) -> void:
 	_play_vo_delayed(_vo(_current_level(), "wrong"), 0.3)
 	# 拖错不惩罚、不锁关卡，只重置计时器继续等待
 	_restart_idle_timer()
-
 
 func _advance() -> void:
 	if _index + 1 >= _levels.size():
@@ -297,7 +308,6 @@ func _on_badge_tapped(index: int) -> void:
 	var list: Array = _current_level().get("badge_vo", [])
 	if index >= 0 and index < list.size():
 		AudioManager.play_vo(str(list[index]))
-	_last_input_ms = Time.get_ticks_msec()
 	_restart_idle_timer()
 
 
@@ -306,7 +316,6 @@ func _on_checklist_finished() -> void:
 		return
 	_state = State.LOCKED
 	_idle_timer.stop()
-	_action_vo_timer.stop()
 	_character.play_success("checklist")
 	AudioManager.play_sfx("highfive")
 	_play_vo_delayed(_vo(_current_level(), "done"), 0.4)
@@ -319,7 +328,6 @@ func _on_checklist_finished() -> void:
 func _finish() -> void:
 	_state = State.FINISHED
 	_idle_timer.stop()
-	_action_vo_timer.stop()
 	AudioManager.stop_loop_sfx()
 	_binder.hide_ghost()
 	_binder.set_interactive(false)
@@ -345,7 +353,6 @@ func _restart_idle_timer() -> void:
 func _on_card_drag_started(_card_id: String) -> void:
 	# 孩子开始操作 → 直接重置计时，隐藏提示，不打断他
 	_binder.hide_ghost()
-	_last_input_ms = Time.get_ticks_msec()
 	_restart_idle_timer()
 
 

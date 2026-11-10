@@ -20,16 +20,29 @@ func _run(main: Node) -> void:
 	var checklist: Node = main.get_node("ChecklistUI")
 
 	await _wait(40)
-	_check(main._levels.size() == 7, "story.json 加载 7 关（含自检清单）")
+	_check(main._levels.size() == 8, "story.json 加载 8 关（7 道具关 + 自检清单）")
+	_check(str(main._levels[5].get("id", "")) == "pants", "第 6 关是新增的穿裤子关")
+	_check(str(main._levels[5].get("req_card", "")) == "card_pants", "穿裤子关要求 card_pants")
+	_check(main._levels[0].has("video_before") and main._levels[0].has("video_after"),
+			"关卡支持 video_before / video_after 过场字段")
 	_check(main._state == main.State.PLAYING, "初始状态 PLAYING")
 	_check(binder.get_card(main._current_level().get("req_card")) != null, "正确卡片已装配")
 	_check(binder.get_card("card_wake") != null, "第 1 关卡片包含 Wake up")
 	_check(character != null and character._head != null, "小人角色已构建")
 	_check(absf(character.rotation + PI * 0.5) < 0.01, "第 1 关小人躺在床上")
 	_check(character._faces["asleep"].visible == true, "躺下时是闭眼表情")
-	_check(checklist != null and checklist._buttons.size() == 5, "自检清单有 5 个徽章")
+	_check(character._item.visible == false, "小人不预先手持道具")
+	_check(checklist != null and checklist._buttons.size() == 6, "自检清单有 6 个徽章（含裤子）")
 	_check(str(main._current_level().get("vo", {}).get("intro", "")) == "vo_act1_intro",
 			"情境配音配置已接入 story.json")
+	_check(main.get_node_or_null("Cutscene") != null, "过场动画层已接入主场景")
+
+	# 0) 过场层：空路径应立即（延迟帧）发出 finished，不卡死流程
+	var cut_done := {"ok": false}
+	main._cutscene.finished.connect(func(): cut_done.ok = true)
+	main._cutscene.play_video("")
+	await _wait(3)
+	_check(cut_done.ok, "空视频路径直接跳过过场并发出 finished")
 
 	var prop: Node = main.get_node("PropLayer").get_child(0)
 	var zone: BaseProp = prop.get_node("DropZone")
@@ -70,22 +83,34 @@ func _run(main: Node) -> void:
 
 	# 5) 连通全流程直至结算（清单关改为点徽章）
 	var guard := 0
+	var pants_seen := {"ok": false}
 	while main._state != main.State.FINISHED and guard < 40:
 		guard += 1
 		var lv: Dictionary = main._current_level()
 		if str(lv.get("kind", "")) == "checklist":
 			_check(checklist._root.visible == true, "自检清单关已显示")
-			for i in 5:
+			for i in 6:
 				checklist._on_badge_pressed(i)
 			await _seconds(2.6)
 			continue
 		var req := str(lv.get("req_card", ""))
 		var p: Node = main.get_node("PropLayer").get_child(0)
 		var z: BaseProp = p.get_node("DropZone")
+		if req == "card_pants":
+			# 穿裤子关：先验证拖错裤子之外的东西只触发 mismatched
+			var before: int = main._index
+			z._drop_data(Vector2.ZERO, {"card_id": "card_shirt"})
+			await _wait(10)
+			_check(main._index == before and main._state == main.State.PLAYING,
+					"穿裤子关拖错不推进")
+			pants_seen.ok = true
 		z._drop_data(Vector2.ZERO, {"card_id": req})
 		await _seconds(2.3)
-	_check(main._state == main.State.FINISHED, "全部 7 关完成")
+		if str(lv.get("id", "")) == "pants":
+			_check(pants_seen.ok, "穿裤子关流程覆盖")
+	_check(main._state == main.State.FINISHED, "全部 8 关完成")
 	_check(end_screen.visible == true, "结算页显示")
+	_check(character._pants_on == true, "通关时小人已穿上裤子")
 
 	# 6) 重开
 	end_screen.restart_pressed.emit()

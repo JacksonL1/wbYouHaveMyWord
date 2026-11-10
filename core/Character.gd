@@ -7,11 +7,10 @@ extends Node2D
 ##   根节点原点 = 脚底中心，向上为 -Y；整体 rotation 控制「躺 / 坐 / 站」。
 ##
 ## 对外接口（由 Main.gd 调用）：
-##   setup_for_level(level_id)   进入关卡时摆好姿态、服装、手持道具、表情
-##   play_action()               播放本关的循环小动作（刷刷 / 擦脸 / 举杯…）
-##   play_success(level_id)      通关反馈动画；返回建议停留秒数
+##   setup_for_level(level_id)   进入关卡时摆好姿态、服装进度、表情
+##   play_success(level_id)      选对后播放本关动作动画（刷牙/喝水/穿衣…）
 ##   play_wrong()                拖错时的轻微摇头
-##   stop_action()               停止循环动作
+##   stop_action()               停止循环表现（Zzz / 泡泡）
 ##
 ## 姿态约定：
 ##   躺下 = rotation -90° + BED_POS（头朝左，正好落在枕头位置）
@@ -25,19 +24,14 @@ const BASE_SCALE := 0.72
 const HEAD_Y := -250.0
 const LYING_ROT := -PI * 0.5
 
-## 各关卡手里拿的小道具
-const ITEM_FILE := {
-	"brush": "mini_brush.png",
-	"drink": "mini_cup.png",
-	"wash": "mini_towel.png",
-	"shirt": "mini_shirt.png",
-	"shoes": "mini_shoe.png",
-}
 ## 通关后需要的停留时长（起床动画最长）
 const SUCCESS_HOLD := {
 	"wake": 3.0,
+	"drink": 1.7,
 	"brush": 1.9,
+	"wash": 1.9,
 	"shirt": 1.8,
+	"pants": 1.9,
 	"shoes": 1.8,
 }
 
@@ -63,6 +57,7 @@ var _arm_tween: Tween
 var _bubble_time := 0.0
 var _level_id := ""
 var _dressed := false
+var _pants_on := false
 var _shoes_on := false
 
 
@@ -169,6 +164,10 @@ func _set_face(name: String) -> void:
 
 func _apply_outfit() -> void:
 	_body.texture = _tex("body_shirt.png") if _dressed else _tex("body_pajama.png")
+	var leg_tex := _tex("leg_pants.png") if _pants_on else _tex("leg.png")
+	if leg_tex:
+		_leg_l.texture = leg_tex
+		_leg_r.texture = leg_tex
 	_shoe_l.visible = _shoes_on
 	_shoe_r.visible = _shoes_on
 
@@ -192,26 +191,27 @@ func reset_to_stand() -> void:
 	_bubbles.visible = false
 	_item.visible = false
 	_dressed = false
+	_pants_on = false
 	_shoes_on = false
 	_apply_outfit()
 	_start_breathe()
 
 
-## 进入关卡：按剧情决定「躺 / 站、衣服、鞋子、手里拿什么、什么表情」
+## 进入关卡：按剧情决定「躺 / 站、服装进度、表情」。
+## 注意：不再预先手持道具、不再循环播放小动作 —— 只有选对卡片，
+## Main 调 play_success() 时才播放对应的动作动画。
 func setup_for_level(level_id: String) -> void:
 	_kill_all()
 	_level_id = level_id
-	_dressed = level_id in ["shoes", "checklist"]
+	_dressed = level_id in ["pants", "shoes", "checklist"]
+	_pants_on = level_id in ["shoes", "checklist"]
 	_shoes_on = level_id == "checklist"
 	_apply_outfit()
 	_reset_limbs()
 
-	# 手持道具
-	var file: String = str(ITEM_FILE.get(level_id, ""))
-	_item.visible = not file.is_empty()
+	# 道具不拿在手上：只在通关动画里短暂出现
+	_item.visible = false
 	_item.modulate.a = 1.0
-	if not file.is_empty():
-		_item.texture = _tex(file)
 
 	scale = Vector2.ONE * BASE_SCALE
 	if level_id == "wake":
@@ -221,8 +221,9 @@ func setup_for_level(level_id: String) -> void:
 		_zzz.visible = true
 		_zzz.modulate.a = 0.9
 		_zzz.rotation = -LYING_ROT
+		_zzz_float()
 	elif level_id == "checklist":
-		# 清单关：小人缩小站到画面下方中央，避开五个徽章
+		# 清单关：小人缩小站到画面下方中央，避开六个徽章
 		rotation = 0.0
 		position = Vector2(640.0, 686.0)
 		scale = Vector2.ONE * 0.62
@@ -232,77 +233,24 @@ func setup_for_level(level_id: String) -> void:
 	else:
 		rotation = 0.0
 		position = STAND_POS
-		_set_face("brush" if level_id == "brush" else "awake")
+		_set_face("awake")
 		_zzz.visible = false
 		_zzz.rotation = 0.0
 
 	_start_breathe()
-	play_action()
+
+
+## 睡觉氛围：Zzz 轻轻飘（属于状态表现，不是动作动画）
+func _zzz_float() -> void:
+	_action_tween = create_tween().set_loops()
+	_action_tween.tween_property(_zzz, "position:y", -370.0, 1.1) \
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_action_tween.tween_property(_zzz, "position:y", -350.0, 1.1) \
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
 
 func get_success_hold() -> float:
 	return float(SUCCESS_HOLD.get(_level_id, 1.5))
-
-
-# --------------------------------------------------------------------------
-# 循环小动作（每关进关后持续播放，通关时停止）
-# --------------------------------------------------------------------------
-func play_action() -> void:
-	stop_action()
-	match _level_id:
-		"wake":
-			_action_tween = create_tween().set_loops()
-			_action_tween.tween_property(_zzz, "position:y", -370.0, 1.1) \
-				.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-			_action_tween.tween_property(_zzz, "position:y", -350.0, 1.1) \
-				.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-		"brush":
-			# 「刷刷」：右臂在嘴边左右快速摆动 + 身体轻晃 + 泡泡
-			_action_tween = create_tween().set_loops()
-			_action_tween.tween_property(_arm_r, "rotation", -1.86, 0.28) \
-				.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-			_action_tween.tween_property(_arm_r, "rotation", -1.30, 0.28) \
-				.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-			_sway_body(0.56)
-			_start_bubbles()
-		"wash":
-			_action_tween = create_tween().set_loops()
-			_action_tween.tween_property(_arm_r, "rotation", -1.48, 0.36) \
-				.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-			_action_tween.tween_property(_arm_r, "rotation", -0.92, 0.36) \
-				.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-			_sway_body(0.72)
-			_start_bubbles()
-		"drink":
-			_action_tween = create_tween().set_loops()
-			_action_tween.tween_property(_arm_r, "rotation", -1.22, 0.9) \
-				.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-			_action_tween.tween_property(_arm_r, "rotation", -0.95, 0.9) \
-				.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-		"shirt":
-			_action_tween = create_tween().set_loops()
-			_action_tween.tween_property(_arm_r, "rotation", -0.36, 0.8) \
-				.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-			_action_tween.tween_property(_arm_r, "rotation", -0.12, 0.8) \
-				.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-		"shoes", "checklist":
-			_action_tween = create_tween().set_loops()
-			_action_tween.tween_property(_arm_r, "rotation", -0.5, 0.7) \
-				.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-			_action_tween.tween_property(_arm_r, "rotation", 0.1, 0.7) \
-				.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-		_:
-			pass
-
-
-func _sway_body(period: float) -> void:
-	if _fx_tween and _fx_tween.is_valid():
-		_fx_tween.kill()
-	_fx_tween = create_tween().set_loops()
-	_fx_tween.tween_property(_body, "rotation", 0.045, period * 0.5) \
-		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	_fx_tween.tween_property(_body, "rotation", -0.045, period * 0.5) \
-		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
 
 ## 泡泡用逐帧正弦驱动（而非 Tween）：5 颗错峰上浮，任何时刻都看得见
@@ -362,13 +310,17 @@ func play_success(level_id: String = "") -> void:
 		"brush":
 			_set_face("happy")
 			_item.visible = false
+			_start_bubbles()
 			_cheer()
 		"wash":
 			_set_face("happy")
 			_item.visible = false
+			_start_bubbles()
 			_cheer()
 		"shirt":
 			_dress_up()
+		"pants":
+			_put_on_pants()
 		"shoes":
 			_put_on_shoes()
 		"checklist":
@@ -451,12 +403,38 @@ func _cheer() -> void:
 
 func _drink_finish() -> void:
 	_set_face("happy")
+	# 杯子只在通关动画里出现：举杯 → 喝 → 放下消失
+	_item.texture = _tex("mini_cup.png")
+	_item.visible = true
+	_item.modulate.a = 1.0
 	var t := create_tween()
 	_main_tween = t
 	t.tween_property(_arm_r, "rotation", -1.7, 0.35).set_trans(Tween.TRANS_SINE)
 	t.tween_interval(0.42)
 	t.tween_property(_arm_r, "rotation", -0.3, 0.4)
 	t.tween_property(_item, "modulate:a", 0.0, 0.2)
+
+
+## 穿裤子：举裤 → 闪一下 → 换成长裤腿型
+func _put_on_pants() -> void:
+	_set_face("happy")
+	_item.texture = _tex("mini_pants.png")
+	_item.visible = true
+	_item.modulate.a = 1.0
+	var t := create_tween()
+	_main_tween = t
+	t.tween_property(_arm_r, "rotation", -1.6, 0.3).set_trans(Tween.TRANS_BACK)
+	t.tween_interval(0.26)
+	t.tween_callback(func() -> void:
+		_pants_on = true
+		_apply_outfit()
+		_item.visible = false
+		AudioManager.play_sfx("sparkle"))
+	t.tween_property(self, "scale", Vector2.ONE * BASE_SCALE * 1.08, 0.16) \
+		.set_trans(Tween.TRANS_BACK)
+	t.tween_property(self, "scale", Vector2.ONE * BASE_SCALE, 0.28) \
+		.set_trans(Tween.TRANS_BACK)
+	t.tween_property(_arm_r, "rotation", 0.0, 0.35)
 
 
 func _dress_up() -> void:

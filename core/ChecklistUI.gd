@@ -19,6 +19,7 @@ const BADGES := [
 	{"en": "Teeth", "cn": "刷牙", "img": "res://assets/props/prop_toothbrush.png"},
 	{"en": "Face", "cn": "洗脸", "img": "res://assets/props/prop_towel.png"},
 	{"en": "Shirt", "cn": "穿衣", "img": "res://assets/props/prop_shirt.png"},
+	{"en": "Pants", "cn": "穿裤", "img": "res://assets/props/prop_pants.png"},
 	{"en": "Shoes", "cn": "穿鞋", "img": "res://assets/props/prop_shoes.png"},
 ]
 

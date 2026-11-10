@@ -303,13 +303,36 @@ def prop_shirt(path):
     c.save(path, INK, 5)
 
 
+def prop_pants(path):
+    """裤子：同色长裤，腰头 + 双腿，透明裤裆"""
+    c = Cv((190, 260))
+    main = "#5B8DD9"
+    dark = "#4A76B8"
+    # 双腿（先画，裤裆自然镂空）
+    c.rrect((38, 96, 90, 250), 16, main)
+    c.rrect((100, 96, 152, 250), 16, main)
+    # 裤腰 + 臀部
+    c.rrect((30, 18, 160, 128), 22, main)
+    c.rect((30, 40, 160, 54), dark)
+    # 裤线
+    c.line([(64, 140), (64, 236)], rgba("#FFFFFF", 70), 3)
+    c.line([(126, 140), (126, 236)], rgba("#FFFFFF", 70), 3)
+    # 口袋
+    c.arc((44, 60, 78, 92), 180, 300, dark, 4)
+    c.arc((112, 60, 146, 92), 240, 360, dark, 4)
+    c.save(path, INK, 5)
+
+
 def prop_shoes(path):
+    """运动鞋：左右脚同款同色、镜像成对"""
     c = Cv((250, 160))
 
-    def sneaker(dx, dy, main, lite):
+    def sneaker(dx, dy):
+        main = PALETTE["coral"]
+        lite = lighten(main, 0.22)
         # 鞋底
         c.rrect((16 + dx, 112 + dy, 138 + dx, 148 + dy), 16, PALETTE["white"])
-        c.rrect((16 + dx, 136 + dy, 138 + dx, 150 + dy), 8, darken(PALETTE["white"], 0.16))
+        c.rrect((16 + dx, 136 + dy, 138 + dx, 150 + dy), 8, darken(PALETTE["white"], 0.14))
         # 鞋身
         c.poly([(28 + dx, 116 + dy), (44 + dx, 62 + dy), (96 + dx, 56 + dy),
                 (124 + dx, 84 + dy), (138 + dx, 112 + dy)], main)
@@ -322,8 +345,46 @@ def prop_shoes(path):
         # 鞋口
         c.arc((54 + dx, 44 + dy, 104 + dx, 78 + dy), 185, 355, PALETTE["white"], 6)
 
-    sneaker(58, 6, PALETTE["coral"], lighten(PALETTE["coral"], 0.2))
-    sneaker(0, 20, PALETTE["blue"], PALETTE["blue_l"])
+    sneaker(0, 14)   # 后脚（左脚）
+    sneaker(108, 0)  # 前脚（右脚），同款同色
+    c.save(path, INK, 5)
+
+
+def char_kid(path):
+    """主角小孩（常驻舞台）：站姿，成功后由导演驱动动作动画"""
+    c = Cv((200, 380))
+    skin = "#FFD9B3"
+    hair = "#5C4033"
+    shirt_c = "#FF8E7A"
+    pants_c = "#5B8DD9"
+    # 腿（裤子）
+    c.rrect((74, 240, 96, 330), 12, pants_c)
+    c.rrect((104, 240, 126, 330), 12, pants_c)
+    # 脚
+    c.ellipse((66, 322, 102, 350), "#FFFFFF")
+    c.ellipse((98, 322, 134, 350), "#FFFFFF")
+    # 手臂（短袖 + 手）
+    c.rrect((44, 144, 66, 206), 11, shirt_c)
+    c.rrect((46, 198, 64, 234), 10, skin)
+    c.rrect((134, 144, 156, 206), 11, shirt_c)
+    c.rrect((136, 198, 154, 234), 10, skin)
+    # 身体
+    c.rrect((62, 128, 138, 252), 22, shirt_c)
+    c.rect((62, 214, 138, 226), lighten(shirt_c, 0.25))
+    # 头
+    c.ellipse((62, 16, 138, 94), skin)
+    # 头发（头顶 + 刘海）
+    c.pieslice((60, 12, 140, 92), 180, 360, hair)
+    c.rrect((78, 26, 96, 44), 8, hair)
+    c.rrect((104, 26, 122, 44), 8, hair)
+    # 表情
+    c.ellipse((80, 50, 90, 62), INK)
+    c.ellipse((110, 50, 120, 62), INK)
+    c.ellipse((80, 52, 86, 58), "#FFFFFF")
+    c.ellipse((110, 52, 116, 58), "#FFFFFF")
+    c.arc((86, 62, 114, 82), 20, 160, INK, 3)
+    c.ellipse((68, 62, 80, 72), rgba(PALETTE["pink"], 190))
+    c.ellipse((120, 62, 132, 72), rgba(PALETTE["pink"], 190))
     c.save(path, INK, 5)
 
 
@@ -391,14 +452,26 @@ def bg_bedroom(path):
     c.save(path)
 
 
-def bg_kitchen(path):
+def bg_living(path):
+    """客厅：沙发 + 壁挂电视 + 绿植（喝水场景）"""
     c = Cv((1280, 720))
-    draw_room(c, "#FDEFD2", "#E9C89B", "#E4C79A", "#F6E2BE")
-    draw_tiles(c, (0, 250, 1280, 404), "#FBF3E2", "#EEDFC4")
-    draw_window(c, (86, 60, 326, 232))
-    draw_shelf(c, (880, 220, 1130, 234), PALETTE["wood_d"],
-               [PALETTE["sky"], PALETTE["pink"], PALETTE["green"]])
-    draw_plant(c, 1176, 430, PALETTE["blue"], PALETTE["green"])
+    draw_room(c, "#E7EFE0", "#E8CFA9", "#D2DEC6", "#F4E9CF")
+    # 壁挂电视
+    c.rrect((430, 150, 620, 280), 14, "#4A3F55")
+    c.rrect((444, 162, 606, 268), 8, "#9ED3E8")
+    c.rect((444, 162, 606, 200), "#BFE3F2")
+    c.rrect((510, 280, 540, 434), 6, "#4A3F55")
+    # 沙发
+    c.rrect((860, 250, 1180, 434), 26, PALETTE["mint"])
+    c.rrect((884, 274, 1010, 380), 20, lighten(PALETTE["mint"], 0.12))
+    c.rrect((1030, 274, 1156, 380), 20, lighten(PALETTE["mint"], 0.12))
+    c.rrect((842, 300, 886, 434), 18, PALETTE["mint_d"])
+    c.rrect((1154, 300, 1198, 434), 18, PALETTE["mint_d"])
+    # 沙发抱枕
+    c.rrect((920, 300, 990, 368), 16, PALETTE["sun"])
+    c.rrect((1070, 300, 1140, 368), 16, PALETTE["coral"])
+    draw_window(c, (80, 60, 320, 240))
+    draw_plant(c, 340, 434, PALETTE["coral"], PALETTE["green"])
     c.save(path)
 
 
@@ -410,16 +483,6 @@ def bg_bathroom(path):
     draw_shelf(c, (900, 262, 1140, 276), PALETTE["white"],
                [PALETTE["mint"], PALETTE["sun"]])
     draw_plant(c, 1180, 430, PALETTE["mint_d"], PALETTE["green"])
-    c.save(path)
-
-
-def bg_bathroom_warm(path):
-    c = Cv((1280, 720))
-    draw_room(c, "#FDE7E1", "#E7D3CC", "#F3C9BC", "#FBE9E3")
-    draw_tiles(c, (0, 230, 1280, 404), "#FDEFEA", "#F0D8D0")
-    draw_window(c, (60, 66, 286, 250), "#FFE1CF")
-    draw_mirror(c, 1060, 190, 170, 200, PALETTE["white"], "#FFE9E2")
-    draw_plant(c, 1180, 430, PALETTE["coral"], PALETTE["green"])
     c.save(path)
 
 
@@ -447,6 +510,10 @@ def main():
     bgs = os.path.join(root, "assets", "bgs")
     props = os.path.join(root, "assets", "props")
     ui = os.path.join(root, "assets", "ui")
+    chars = os.path.join(root, "assets", "characters")
+
+    print("[art] 生成角色…")
+    char_kid(os.path.join(chars, "kid.png"))
 
     print("[art] 生成道具…")
     prop_bed(os.path.join(props, "prop_bed.png"))
@@ -454,6 +521,7 @@ def main():
     prop_toothbrush(os.path.join(props, "prop_toothbrush.png"))
     prop_towel(os.path.join(props, "prop_towel.png"))
     prop_shirt(os.path.join(props, "prop_shirt.png"))
+    prop_pants(os.path.join(props, "prop_pants.png"))
     prop_shoes(os.path.join(props, "prop_shoes.png"))
 
     print("[art] 生成 UI…")
@@ -463,10 +531,8 @@ def main():
 
     print("[art] 生成背景…")
     bg_bedroom(os.path.join(bgs, "bg_bedroom.png"))
-    bg_kitchen(os.path.join(bgs, "bg_kitchen.png"))
+    bg_living(os.path.join(bgs, "bg_living.png"))
     bg_bathroom(os.path.join(bgs, "bg_bathroom.png"))
-    bg_bathroom_warm(os.path.join(bgs, "bg_bathroom_warm.png"))
-    bg_wardrobe(os.path.join(bgs, "bg_wardrobe.png"))
     bg_entry(os.path.join(bgs, "bg_entry.png"))
     print("[art] done.")
 

@@ -1,10 +1,11 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://core/Main.gd" id="1_main"]
 [ext_resource type="PackedScene" path="res://scenes/BinderUI.tscn" id="2_binder"]
 [ext_resource type="PackedScene" path="res://scenes/EndScreen.tscn" id="3_end"]
 [ext_resource type="PackedScene" path="res://scenes/Character.tscn" id="4_char"]
 [ext_resource type="PackedScene" path="res://scenes/ChecklistUI.tscn" id="5_checklist"]
+[ext_resource type="Script" path="res://core/Cutscene.gd" id="6_cut"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
@@ -25,6 +26,42 @@ stretch_mode = 0
 [node name="ChecklistUI" parent="." instance=ExtResource("5_checklist")]
 
 [node name="EndScreen" parent="." instance=ExtResource("3_end")]
+
+[node name="Cutscene" type="CanvasLayer" parent="."]
+layer = 3
+script = ExtResource("6_cut")
+
+[node name="Root" type="Control" parent="Cutscene"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+
+[node name="Video" type="VideoStreamPlayer" parent="Cutscene/Root"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand = true
+
+[node name="SkipHint" type="Label" parent="Cutscene/Root"]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -220.0
+offset_top = -64.0
+offset_right = -24.0
+offset_bottom = -24.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_colors/font_color = Color(1, 1, 1, 0.8)
+theme_override_font_sizes/font_size = 24
+text = "点击屏幕跳过 →"
+horizontal_alignment = 2
+vertical_alignment = 1
+mouse_filter = 2
 
 [node name="IdleTimer" type="Timer" parent="."]
 wait_time = 10.0
